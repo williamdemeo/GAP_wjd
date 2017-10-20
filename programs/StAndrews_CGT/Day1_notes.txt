@@ -1,0 +1,7 @@
+Questions:
+
+1. How to print working directory in GAP?  (pwd)
+
+2. How to change working directory in GAP?  (cd)
+
+3. How to print the GAP command line history?  (history)

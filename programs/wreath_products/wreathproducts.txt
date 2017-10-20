@@ -1,0 +1,163 @@
+Dear Martyn,
+
+On Sep 30, 2005, at 9:43 AM, Martyn Quick wrote:
+
+> I'm trying to construct a wreath product in such a way I can find  
+> my standard generators very easily.
+>
+> For example, I've just tried:
+>
+> A := CyclicGroup(3);
+> B := CyclicGroup(9);
+> W := WreathProduct(A,B)
+>
+> which all seems fine... but how do I get hold of my favourite  
+> generators for this wreath product?  (i.e., an element in the base  
+> group and an element generating my top group).
+
+You want to use `Embedding'. If B is a permutation group of degree n,  
+then
+Embedding(W,1)  to Embedding(W,n) are maps from A into the n copies  
+of A in W.
+Embedding(W,n+1) is a map from B to the chosen complement.
+
+(Projection(W) is a map from W to B).
+
+Then using `Image', you can get map your favourite generators of A  
+and B into W.
+
+Best,
+
+    Alexander
+Dear GAP-Forum,
+
+Bruce Coletti asked:
+> If S8 and S3 are respectively the symmetric groups on 8 and 3 letters, what
+> values of f and Z would equate WreathProduct(S8,S3,IdentityMapping(S3)) to
+> SemidirectProduct(DirectProduct(S8,S8,S8),f,Z), where f is a homomorphism
+> from DirectProduct(S8,S8,S8) into Aut(Z)?
+
+There has been some confusion recently in the Forum about semidirect
+products, which I would like to clarify. The GAP syntax is:
+
+S:=SemidirectProduct(G,hom,H);
+
+S will be a group that contains a normal subgroup N isomorphic to H and a
+complement U to N which is isomorphic to G. The homomorphism hom goes from G
+to a group acting on H and will describe the conjugation action of U on N. I
+append an example for constructing the mentioned wreath product as a
+semidirect product. GAP currently does no complete test for the validity of
+the arguments
+
+I should add that 'SemidirectProduct' is mainly of educational value. There
+are basically no special methods installed for groups constructed this way.
+Most operations will fall back on generic routines that work with element
+lists. I would not recommend to use these 'SemidirectProducts' for any
+serious work, but rather suggest to construct such semidirect products
+directly in a more suitable representation, for example as a subgroup of the
+regular wreath product H\wr_{reg} G. (This embedding can be found for
+example in Huppert: Endliche Gruppen, Theorem I.15.9. It is not difficult
+conceptually, but to give explicit generators for an embedding requires care
+and can be tedious.)
+
+I hope this helps.
+
+Best regards,
+
+    Alexander Hulpke 
+
+# Get S8 and S3
+gap> S8:=SymmetricGroup(8);
+Group( (1,8), (2,8), (3,8), (4,8), (5,8), (6,8), (7,8) )
+gap> S3:=SymmetricGroup(3);
+Group( (1,3), (2,3) )
+# Form S8^3
+gap> H:=DirectProduct(S8,S8,S8);
+Group( (1,8), (2,8), (3,8), (4,8), (5,8), (6,8), (7,8), ( 9,16), (10,16), 
+(11,16), (12,16), (13,16), (14,16), (15,16), (17,24), (18,24), (19,24), 
+(20,24), (21,24), (22,24), (23,24) )
+# To describe automorphisms of H, we need the generators of H
+gap> hgens:=H.generators;
+[ (1,8), (2,8), (3,8), (4,8), (5,8), (6,8), (7,8), ( 9,16), (10,16), (11,16), 
+  (12,16), (13,16), (14,16), (15,16), (17,24), (18,24), (19,24), (20,24), 
+  (21,24), (22,24), (23,24) ]
+# corresponding (1,3): Exchange 1st and 3rd component
+gap> hom1:=GroupHomomorphismByImages(H,H,hgens,hgens{Concatenation([15..21],[8..14],[1..7])});;
+# corresponding (2,3): Exchange 2nd and 3rd component
+gap> hom2:=GroupHomomorphismByImages(H,H,hgens,hgens{Concatenation([1..7],[15..21],[8..14])});;
+# Usually in GAP3 it is good to tell GAP that these objects indeed respect
+# relators (For example (1,3),(2,4) -> (1,2,3),(2,3,4) would not !)
+# GAP otherwise will test this which sometimes may take very long.
+gap> hom1.isMapping:=true;;
+gap> hom2.isMapping:=true;;
+# form a group acting on H
+gap> aut:=Group(hom1,hom2);;
+# now form the mapping from S3 into the automorphism group
+gap> ahom:=GroupHomomorphismByImages(S3,aut,S3.generators,aut.generators);;
+gap> ahom.isMapping:=true;;
+# now we can build the semidirect product
+gap> sdp:=SemidirectProduct(S3,ahom,H);;
+# indeed the size is OK
+gap> Size(sdp);
+393289924608000
+gap> Factorial(8)^3*6;
+393289924608000
+# Prove isomorphism to S8 \wr S3. (Note that finding the isomorphism by GAP
+# is unfeasible in this situation.) We use implicitly information about
+# which generators are chosen for the wreath product and construct the
+# isomorphism by mapping generators.
+w:=WreathProduct(S8,S3,IdentityMapping(S3));
+Group( (1,8), (2,8), (3,8), (4,8), (5,8), (6,8), (7,8), ( 9,16), (10,16), 
+(11,16), (12,16), (13,16), (14,16), (15,16), (17,24), (18,24), (19,24), 
+(20,24), (21,24), (22,24), (23,24), ( 1,17)( 2,18)( 3,19)( 4,20)( 5,21)(6,22)
+( 7,23)( 8,24), ( 9,17)(10,18)(11,19)(12,20)(13,21)(14,22)(15,23)(16,24) )
+gap> iso:=GroupHomomorphismByImages(w,sdp,w.generators,sdp.generators{
+  Concatenation([3..23],[1,2])});;                                             
+# test that it is a homomorphism, (This takes some time!)
+# thus by a size argument (note that the images of the generators of contain
+# all generaors of sdp) both groups are isomorphic.
+gap> IsHomomorphism(iso);
+true;
+# Further computations (for example for the Kernel of iso) are unfeasible
+# again.
+
+
+Dear GAP-forum, Dear Kursat Aker,
+
+> Gi := Dihedral(8);
+> n := 3;S_n := SymmetricGroup( n );
+> G := WreathProduct( Gi, S_n );
+> x := One(G);
+> x![1] := 3;
+
+This access to internal components, while not technically prohibited, is not advisable.
+- The internal structures are not documented and not guaranteed to stay fixed between versions
+- doing so is very representation dependent. If you use instead DihedralGroup(IsPermGroup,8) this kind of access will not work.
+- Finally, modifying internal components of objects is likely to lead to the system to become seriously confused.
+> 
+> I don't know what ! means. Does this allow me to change an immutable object such
+> as One(G) ?
+
+Yes -- this access is apparently possible for these particular objects, but the existing 
+code assumes that nothing like this would happen. Basically after such an assignment 
+the group created is broken.
+
+> Question (2):
+> -------------
+> 
+> How can I create elements inside the wreath product ?
+
+The proper way to create elements (independent of the representation) is to use homomorphisms: 
+E.g. for elements a,b,c in D8 and d in Sn create the element (a,b,c;d) in the wreath product use:
+
+emb:=List([1..4],x->Embedding(G,x));;
+Image(emb[1],a)*Image(emb[2],b)*Image(emb[3],c)*Image(emb[4],d);
+
+You can similarly use these homomorphisms (and the one returned by Projection(G))
+to decompose, using PreImagesRepresentative (after dividing off the S3-part).
+
+Regards,
+
+Alexander Hulpke
+
+
