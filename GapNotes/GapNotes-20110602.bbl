@@ -1,0 +1,30 @@
+\begin{thebibliography}{1}
+
+\bibitem{Dixon:1996}
+John Dixon and Brian Mortimer.
+\newblock {\em Permutation Groups}.
+\newblock Springer-Verlag, New York, 1996.
+
+\bibitem{gaptutorial}
+The~GAP Group.
+\newblock {\em GAP: A Tutorial}.
+\newblock http://www.gap-system.org, December 2008.
+\newblock Release 4.4.12.
+
+\bibitem{gapmanual}
+The~GAP Group.
+\newblock {\em GAP: Reference Manual}.
+\newblock http://www.gap-system.org, December 2008.
+\newblock Release 4.4.12.
+
+\bibitem{Hungerford:1974}
+Thomas~W. Hungerford.
+\newblock {\em Algebra}.
+\newblock Springer-Verlag, New York, 1974.
+
+\bibitem{Suzuki:1982}
+Michio Suzuki.
+\newblock {\em Group Theory}, volume~1.
+\newblock Springer-Verlag, New York, 1982.
+
+\end{thebibliography}
